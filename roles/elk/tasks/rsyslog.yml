@@ -1,0 +1,46 @@
+---
+- name: Instalar pacotes do rsyslog
+  yum:
+    name: "{{ rsyslog_packages }}"
+    state: present
+
+- name: Criar diretorios
+  file:
+    path: "{{ rsyslog_path }}"
+    mode: 0777
+    owner: root
+    group: root
+    state: directory
+
+- name: Configurar arquivo padrão
+  template:
+    src: "rsyslog.conf.j2"
+    dest: "/etc/rsyslog.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Configurar include do syslog
+  template:
+    src: "server.conf"
+    dest: "/etc/rsyslog.d/20-server.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Configurar modulos
+  template:
+    src: "69-module-load.conf.j2"
+    dest: "/etc/rsyslog.d/10-module-load.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart rsyslog
+
+- name: Configurar logrotate
+  template:
+    src: "rsyslog-logrotate.j2"
+    dest: "/etc/logrotate.d/rsyslog-server"
+    owner: root
+    group: root
+    mode: 0644

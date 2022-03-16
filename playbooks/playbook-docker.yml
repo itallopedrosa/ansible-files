@@ -1,0 +1,8 @@
+---
+# Playbook para instalação docker-ce. 
+
+- hosts: glowroot
+  become: yes
+  become_method: sudo
+  roles:
+    - docker

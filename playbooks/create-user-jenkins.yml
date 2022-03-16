@@ -1,0 +1,10 @@
+---
+
+- hosts: STURDESJBOSS02
+  gather_facts: yes
+  become: yes
+#  become_user: root
+  become_method: sudo
+  roles:
+    - create-user-jenkins
+

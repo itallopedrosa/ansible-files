@@ -1,0 +1,14 @@
+---
+- name: Copia Conf SSHD
+  copy:
+    src: files/sshd_config
+    dest: /etc/ssh
+    owner: root
+    group: root
+    mode: 0600
+  notify: restart ssh
+
+- name: Reiniciar Serviço
+  service:
+    name: sshd
+    state: restarted

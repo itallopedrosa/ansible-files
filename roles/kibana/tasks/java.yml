@@ -1,0 +1,58 @@
+---
+- name: Configurar java_state para present
+  set_fact: 
+    java_state: present
+
+- name: Configurar java_state para latest
+  set_fact: 
+    java_state: latest
+  when: update_java == true
+
+- name: RedHat - Instalar Java
+  become: yes
+  yum: 
+    name: "{{ java }}" 
+    state: "{{java_state}}"
+  when: ansible_os_family == 'RedHat'
+
+- name: Pegar caminho instalado do java
+  shell: "update-alternatives --display java | grep '^/' | awk '{print $1}' | grep 1.8.0 | head -1"
+  become: yes
+  register: java_full_path
+  failed_when: False
+  changed_when: False
+  check_mode: no
+  when: ansible_os_family == 'RedHat'
+
+- name: Corrigir versão selecionada do java
+  alternatives:
+    name: java
+    path: "{{ java_full_path.stdout }}"
+    link: /usr/bin/java
+  when: ansible_os_family == 'RedHat' and java_full_path is defined
+
+- name: Refresh repositorio do java
+  become: yes
+  apt: update_cache=yes
+  changed_when: false
+  when: ansible_os_family == 'Debian'
+
+- name: Debian - Verificar se o Java está instalado
+  become: yes
+  apt: 
+    name: "{{ java }}" 
+    state: "{{java_state}}"
+  when: ansible_os_family == 'Debian'
+
+- name: Registrar versão open_jdk
+  shell: java -version 2>&1 | grep OpenJDK
+  register: open_jdk
+  ignore_errors: yes
+  changed_when: false
+  check_mode: no
+
+- name: Refresh o ca-certificates do java (Debian)
+  become: yes
+  command: /var/lib/dpkg/info/ca-certificates-java.postinst configure
+  when: ansible_distribution == 'Ubuntu' and open_jdk.rc == 0
+  changed_when: false

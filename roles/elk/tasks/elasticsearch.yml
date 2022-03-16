@@ -1,0 +1,8 @@
+---
+- name: Adicionar playbook elasticsearch para Debian
+  include: elasticsearch-Debian.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Adicionar playbook elasticsearch para RedHat
+  include: elasticsearch-RedHat.yml
+  when: ansible_os_family == 'RedHat'

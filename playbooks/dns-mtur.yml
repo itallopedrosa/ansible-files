@@ -1,0 +1,14 @@
+# Realiza a copia do template do arquivo resolv.conf
+
+---
+
+- hosts: app-hlog
+  gather_facts: yes
+  become: yes
+  become_user: root
+  become_method: su
+  tasks:
+
+  - name: Copiando resolv.conf
+    copy: src=/etc/ansible/files/resolv-mtur.conf dest=/etc/resolv.conf owner=root group=root mode=644 backup=yes
+

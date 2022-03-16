@@ -1,0 +1,7 @@
+---
+- hosts: debian8
+  become: yes
+  become_method: sudo
+
+  roles:
+    - zabbix-agent-debian8

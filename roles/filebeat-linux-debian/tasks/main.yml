@@ -1,0 +1,24 @@
+---
+- name: Copia o arquivo deb
+  copy:
+     src: filebeat-7.14.2-amd64.deb
+     dest: /tmp/filebeat-7.14.2-amd64.deb
+     
+- name: Instala o pacote DEB.
+  apt:
+     deb: /tmp/filebeat-7.14.2-amd64.deb
+           
+- name: Copia o arquivo de configuração
+  template: src=filebeat.yml.j2 dest=/etc/filebeat/filebeat.yml owner=root group=root mode=0644 backup=yes
+
+- name: Habilitar o modulo system
+  shell: filebeat modules enable system
+
+- name: Habilita o modulo audit
+  shell: filebeat modules enable auditd
+
+- name: Instala os modulos do filebeat
+  shell: filebeat setup
+  
+- name: Habilita e Inicia o Serviço
+  service: name=filebeat state=started enabled=yes

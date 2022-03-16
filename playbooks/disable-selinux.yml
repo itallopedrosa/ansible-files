@@ -1,0 +1,6 @@
+---
+- hosts: novosbancos
+  become: true
+  become_method: sudo
+  roles:
+    - role: disable-selinux-centos

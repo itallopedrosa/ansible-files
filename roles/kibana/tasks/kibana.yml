@@ -1,0 +1,30 @@
+---
+- include: setup-RedHat.yml
+  when: ansible_os_family == 'RedHat'
+
+- include: setup-Debian.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Instalar Kibana
+  package:
+    name: "{{ kibana_package }}"
+    state: present
+
+- name: Reload Systemd
+  systemd:
+    daemon_reload: yes
+
+- name: Iniciar serviço e habilita-lo no boot
+  service:
+    name: kibana
+    state: started
+    enabled: yes
+
+- name: Copiar arquivo de configuração do Kibana
+  template:
+    src: kibana.yml.j2
+    dest: /etc/kibana/kibana.yml
+    owner: root
+    group: root
+    mode: 0644
+  notify: Reiniciar kibana

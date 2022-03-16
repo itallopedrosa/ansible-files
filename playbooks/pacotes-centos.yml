@@ -1,0 +1,19 @@
+- hosts: citsmart-hlog
+  become: yes
+  become_method: sudo
+  tasks:
+  - name: Install basic packages - Mtur
+    yum: name={{ item }} state=installed
+    with_items:
+      - vim-enhanced
+      - wget
+      - git
+      - unzip
+      - bind-utils
+      - net-tools
+      - htop
+      - ncdu
+      - wget
+      - telnet
+      - mlocate
+    tags: General_Packages

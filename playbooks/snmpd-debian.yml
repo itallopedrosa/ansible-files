@@ -1,0 +1,20 @@
+# Playbook para Instalar e Configurar o Cliente SNMP em servidores Debian
+
+---
+
+- hosts: todos
+  gather_facts: yes
+  vars:
+  tasks:
+
+  - name: Instalando Pacote snmpd
+    apt: name=snmpd state=latest
+
+  - name: Habilitando o servico snmp
+    service: name=snmpd enabled=yes
+
+  - name: Copiando o arquivo de configuracao snmpd.conf
+    copy: src=/static_files/snmpd.conf dest=/etc/snmp/snmpd.conf owner=root group=root mode=644 backup=yes
+
+  - name: Reiniciando Servico
+    service: name=snmpd state=restarted

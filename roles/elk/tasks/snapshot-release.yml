@@ -1,0 +1,52 @@
+---
+- name: Detectar se é necessário pacotes do tipo .deb or .rpm
+  set_fact:
+    package_type: "{{ 'deb' if (ansible_os_family == 'Debian') else 'rpm' }}"
+
+- name: Pegar Release
+  set_fact:
+    minor_version: "{{ es_version.split('.')[0:2] | join('.')}}"
+
+- name: Habilitar package_name
+  set_fact:
+    package_name: "{{ es_package_name + '-' + es_version + '-SNAPSHOT.' + package_type }}"
+
+- name: Gerar os artefatos de url
+  set_fact:
+    artifacts_url: "{{ 'https://artifacts-api.elastic.co/v1/search/' + minor_version + '/' + package_name }}"
+
+- name: Pegar ultima build de snapshot
+  uri:
+    url: "{{ artifacts_url }}"
+    return_contents: true
+  register: snapshots
+  retries: 5
+  delay: 1
+  ignore_errors: true
+  until: "'status' in snapshots and snapshots.status == 200"
+  check_mode: no
+
+- name: Usar o pacote customizado instalado no repositorio
+  set_fact:
+    es_custom_package_url: "{{ snapshots.json['packages'][package_name]['url'] }}"
+    es_use_repository: false
+
+- name: Habilitar urls de snapshot para es_plugins quando definido
+  when: es_plugins is defined
+  block:
+  - name: Remover url de snapshot quando criado a url de plugin
+    set_fact:
+      split_url: "{{ es_custom_package_url.split('/') }}"
+  
+  - name: Habilitar url para plugins base
+    set_fact:
+      plugin_url: "{{ split_url[0] + '//' + split_url[2:5]|join('/') + '/elasticsearch-plugins/'}}"
+  
+  - name: Criar es_plugins com a url de snapshot
+    set_fact:
+      es_plugins_temp: "{{ es_plugins_temp|default([]) + [{'plugin': item.plugin, 'url': plugin_url + item.plugin + '/' + item.plugin + '-' + es_version + '-SNAPSHOT.zip'}] }}"
+    with_items: "{{ es_plugins }}"
+  
+  - name: Substituir o es_plugin original pela versão do snapshot
+    set_fact:
+      es_plugins: "{{ es_plugins_temp }}"

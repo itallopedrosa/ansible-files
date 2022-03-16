@@ -1,0 +1,10 @@
+---
+# Playbook para instalacao em massa do agente do netbackup em hosts linux redhat-like. 
+
+- hosts: elk
+  become: yes
+  become_method: sudo
+
+
+  roles:
+    - netbackup-rhel

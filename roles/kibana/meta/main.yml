@@ -1,0 +1,16 @@
+---
+galaxy_info:
+  author: Giuliano Caixeta Domingues
+  description: Instalação de Elasticsearch, Kibana, Logstash e Filebeat via Ansible
+  company: CentralIT
+  contributors:
+    - Giuliano Caixeta Domingues
+  license: GPLv3
+  min_ansible_version: 1.2
+  platforms:
+  - name: RedHat Family
+    versions:
+    - all
+  - name: Debian Family
+    versions:
+    - all

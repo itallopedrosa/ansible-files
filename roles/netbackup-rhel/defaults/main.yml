@@ -1,0 +1,5 @@
+---
+# defaults file for netbackup
+#
+#
+netbackup_server: "sturespbkp01.mtur.gov.br"

@@ -1,0 +1,15 @@
+---
+- name: Pegar lista de plugins instalados
+  command: >
+    ./bin/logstash-plugin list
+    chdir={{ logstash_dir }}
+  register: logstash_plugins_list
+  changed_when: false
+
+- name: Instalar plugins configurados
+  command: >
+    ./bin/logstash-plugin install {{ item }}
+    chdir={{ logstash_dir }}
+  with_items: "{{ logstash_install_plugins }}"
+  when: "item not in logstash_plugins_list.stdout"
+  notify: restart logstash

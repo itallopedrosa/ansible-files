@@ -1,0 +1,14 @@
+---
+- name: Instalar Filebeat
+  package: 
+    name: filebeat 
+    state: present
+
+- include: filebeat-config.yml
+  when: filebeat_create_config | bool
+
+- name: Verificar se o Filebeat está iniciado e habilitado no boot
+  service:
+    name: filebeat
+    state: started
+    enabled: true

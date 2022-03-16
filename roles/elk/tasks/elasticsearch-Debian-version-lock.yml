@@ -1,0 +1,6 @@
+---
+- name: Debian - verificar versão em uso do elasticsearch
+  become: yes
+  dpkg_selections:
+    name: "{{ es_package_name }}"
+    selection: "hold"

@@ -1,0 +1,20 @@
+---
+#- name: Copia o arquivo deb
+#  copy:
+#     src: zabbix-agent_5.0.11-1+jessie_amd64.deb
+#     dest: /tmp/zabbix-agent_5.0.11-1+jessie_amd64.deb
+     
+#- name: Instala o pacote DEB.
+#  apt:
+#     deb: /tmp/zabbix-agent_5.0.11-1+jessie_amd64.deb
+#     state: present
+     
+           
+- name: Copia o arquivo de configuração
+  template: src=zabbix_agentd.conf.j2 dest=/etc/zabbix/zabbix_agentd.conf owner=root group=root mode=0644 backup=yes
+  
+- name: Habilita e Inicia o Serviço
+  service: name=zabbix-agent state=started enabled=yes
+
+- name: Reinicia o Serviço
+  service: name=zabbix-agent state=restarted

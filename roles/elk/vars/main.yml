@@ -1,0 +1,19 @@
+---
+es_package_url: "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch"
+reserved_xpack_users: ["elastic","kibana","logstash_system"]
+sysd_config_file: "/etc/systemd/system/elasticsearch.service.d/override.conf"
+rsyslog_packages:
+  - rsyslog
+  - rsyslog-elasticsearch
+  - rsyslog-gnutls
+  - rsyslog-gssapi
+  - rsyslog-mysql
+  - rsyslog-pgsql
+  - rsyslog-snmp
+  - rsyslog-crypto
+  - rsyslog-mmkubernetes
+  - rsyslog-mmsnmptrapd
+  - rsyslog-mmnormalize
+  - rsyslog-mmjsonparse
+  - rsyslog-mmaudit
+  - rsyslog-udpspoof

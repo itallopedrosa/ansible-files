@@ -1,0 +1,15 @@
+---
+#- name: Carregar playbook main-elasticsearch.yml
+#  include_tasks: main-elasticsearch.yml
+
+- name: Carregar playbook kibana.yml
+  include_tasks: kibana.yml
+
+#- name: Carregar playbook logstash.yml
+#  include_tasks: logstash.yml
+
+#- name: Carregar playbook filebeat.yml
+#  include_tasks: filebeat.yml
+
+#- name: Carregar playbook rsyslog.yml
+#  include_tasks: rsyslog.yml

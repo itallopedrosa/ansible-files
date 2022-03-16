@@ -1,0 +1,7 @@
+---
+- hosts: grafana
+  become: yes
+  become_method: sudo
+
+  roles:
+    - metricbeat-linux

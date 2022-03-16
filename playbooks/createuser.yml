@@ -1,0 +1,21 @@
+# Criacao de Usuario Local em Servidores Debian Mtur
+
+---
+
+- hosts: debian-dev
+  gather_facts: yes
+  become: yes
+  become_method: sudo
+  tasks:
+
+
+  - name: Criando Usuario Local de Admin
+    user: 
+      name: samuel.admin
+      password: $1$SomeSalt$QF2l9NC7cR2gsIl6Z65.90
+      shell: /bin/bash
+      comment: Usuario Analista Central IT
+      group: sudo
+      createhome: yes
+
+

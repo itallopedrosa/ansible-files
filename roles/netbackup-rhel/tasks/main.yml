@@ -1,0 +1,16 @@
+---
+# tasks file for netbackup
+#
+- name: Instala Pacote Expect nos servidores
+  yum:
+    name: expect
+    state: latest
+
+#- name: Copiando os arquivos de instalacao
+#  copy: src=/nbu/NetBackup_7.6.0.1_CLIENTS2 dest=/opt/ owner=root group=root mode=0755
+
+- name: Copia o script de instalacao do cliente Netbackup
+  template: backup=yes src=netbackupinstall.j2 dest=/tmp/netbackupinstall owner=root group=sys mode=0755
+
+- name: Instalacao do Netbackup Client
+  command: /tmp/netbackupinstall

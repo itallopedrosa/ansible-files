@@ -1,0 +1,18 @@
+---
+- hosts: elastic-prod-master
+  become: yes
+  become_method: sudo
+  roles:
+    - role: elastic.elasticsearch
+  vars:
+    es_heap_size: "4g"
+    es_config:
+      cluster.name: "producao-cluster"
+      cluster.initial_master_nodes: ["pvlsede012","pvlsede013","pvlsede014"]
+      discovery.seed_hosts: ["pvlsede012","pvlsede013","pvlsede014"]
+      http.port: 9200
+      node.data: false
+      node.master: true
+      bootstrap.memory_lock: false
+#    es_plugins:
+#     - plugin: ingest-attachment

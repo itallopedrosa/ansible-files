@@ -1,0 +1,49 @@
+---
+- name: Instalar https
+  apt:
+    name: apt-transport-https
+    state: present
+
+- name: Adicionar chave para Elasticsearch
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+
+- name: Adicionar repositorio para Logstash
+  apt_repository:
+    repo: 'deb https://artifacts.elastic.co/packages/{{ logstash_version }}/apt stable main'
+    state: present
+
+- name: Verificar se o logstash está instalado
+  stat: 
+    path: /etc/init.d/logstash
+  register: logstash_installed
+
+- name: Atualizar cache de repositorio para o debian
+  apt: 
+    update_cache: yes
+  when: not logstash_installed.stat.exists
+
+- name: Adicionar usuario logstash no grupo adm (Debian)
+  user:
+    name: logstash
+    group: logstash
+    groups: adm
+  notify: restart logstash
+
+- name: Verificar se a dependencia esta instalada
+  apt: 
+    name: apt-transport-https 
+    state: present
+
+- name: Adicionar chave apt para o Elasticsearch
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    id: 46095ACC8548582C1A2699A9D27D666CD88E42B4
+    state: present
+
+- name: Adicionar repositorio para o Filebeat
+  apt_repository:
+    repo: 'deb https://artifacts.elastic.co/packages/{{ filebeat_version }}/apt stable main'
+    state: present
+    update_cache: true

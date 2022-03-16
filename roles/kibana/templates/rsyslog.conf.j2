@@ -1,0 +1,38 @@
+### MODULES ####
+
+$ModLoad imuxsock   # provides support for local system logging (e.g. via logger command)
+$ModLoad imklog     # provides kernel logging support (previously done by rklogd)
+$ModLoad imjournal
+$ModLoad immark      # provides --MARK-- message capability
+
+$ModLoad imudp
+$UDPServerRun 514
+
+$ModLoad imtcp
+$InputTCPServerRun 514
+
+#$PreserveFQDN on
+
+#### GLOBAL DIRECTIVES ####
+
+$WorkDirectory /var/lib/rsyslog
+$ActionFileDefaultTemplate RSYSLOG_TraditionalFileFormat
+$ActionFileEnableSync on
+
+##### INCLUDES ####
+
+$IncludeConfig /etc/rsyslog.d/*.conf
+$OmitLocalLogging on
+$IMJournalStateFile imjournal.state
+
+##### RULES ####
+
+*.info;mail.none;authpriv.none;cron.none;local6.none    /var/log/messages
+authpriv.*                                              /var/log/secure
+mail.*                                                  -/var/log/maillog
+cron.*                                                  /var/log/cron
+*.emerg                                                 :omusrmsg:*
+uucp,news.crit                                          /var/log/spooler
+local7.*                                                /var/log/boot.log
+
+*.* @@{{ rsyslog_server }}:{{ tcp_port }}

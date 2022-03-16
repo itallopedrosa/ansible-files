@@ -1,0 +1,83 @@
+---
+- name: Habilitar es_plugins_reinstall para true
+  set_fact: 
+    es_plugins_reinstall: true
+  when: (((debian_elasticsearch_install_from_repo is defined and debian_elasticsearch_install_from_repo.changed) or (redhat_elasticsearch_install_from_repo is defined and redhat_elasticsearch_install_from_repo.changed)) or (elasticsearch_install_from_package is defined and elasticsearch_install_from_package.changed)) or es_plugins is not defined or es_plugins is none
+
+- name: Habilitar list_command
+  set_fact: list_command=""
+
+- name: Habilitar list_command para x-pack
+  set_fact: list_command="| grep -vE 'x-pack'"
+  when: not es_plugins_reinstall
+
+- name: Remover diretório de plugin x-pack quando diretorio nao existir
+  file:
+    dest: "{{ es_home }}/plugins/x-pack"
+    state: "absent"
+  when: es_open_xpack
+
+- name: Verificar se plugin do elasticsearch está instalado
+  shell: "ls {{es_home}}/plugins {{list_command}}"
+  register: installed_plugins
+  changed_when: False
+  ignore_errors: yes
+  environment:
+    CONF_DIR: "{{ es_conf_dir }}"
+    ES_PATH_CONF: "{{ es_conf_dir }}"
+    ES_INCLUDE: "{{ default_file }}"
+  check_mode: no
+
+- name: Habilitar plugins_to_remove para install_plugins.stdout_lines
+  set_fact: 
+    plugins_to_remove: "{{ installed_plugins.stdout_lines | default([]) }}"
+  when: es_plugins_reinstall
+
+- name: Habilitar plugins_to_remove para delete plugins installed mas não listado em es_plugins
+  set_fact: 
+    plugins_to_remove: "{{ installed_plugins.stdout_lines | difference(es_plugins | json_query('[*].plugin')) | default([]) }}"
+  when: not es_plugins_reinstall
+
+- name: Habilitar plugins_to_install para es_plugins
+  set_fact: 
+    plugins_to_install: "{{ es_plugins | json_query('[*].plugin') | default([]) }}"
+  when: es_plugins_reinstall
+
+- name: Habilitar plugins_to_install para utilizar es_config sem estar instalado
+  set_fact: 
+    plugins_to_install: "{{ es_plugins | json_query('[*].plugin') | difference(installed_plugins.stdout_lines) | default([]) }}"
+  when: not es_plugins_reinstall
+
+- name: Remover plugins elasticsearch
+  command: "{{ es_home }}/bin/elasticsearch-plugin remove {{item}} --silent"
+  with_items: "{{ plugins_to_remove | default([]) }}"
+  notify: restart elasticsearch
+  register: plugin_removed
+  environment:
+    CONF_DIR: "{{ es_conf_dir }}"
+    ES_PATH_CONF: "{{ es_conf_dir }}"
+    ES_INCLUDE: "{{ default_file }}"
+
+- name: Instalar plugins elasticsearch
+  command: "{{ es_home }}/bin/elasticsearch-plugin install {{ item.url | default(item.plugin) }} --batch --silent"
+  register: plugin_installed
+  changed_when: plugin_installed.rc == 0
+  with_items: "{{ es_plugins }}"
+  when: item.plugin in plugins_to_install
+  notify: restart elasticsearch
+  environment:
+    CONF_DIR: "{{ es_conf_dir }}"
+    ES_PATH_CONF: "{{ es_conf_dir }}"
+    ES_INCLUDE: "{{ default_file }}"
+    ES_JAVA_OPTS: "{% if item.proxy_host is defined and item.proxy_host != '' and item.proxy_port is defined and item.proxy_port != ''%} -Dhttp.proxyHost={{ item.proxy_host }} -Dhttp.proxyPort={{ item.proxy_port }} -Dhttps.proxyHost={{ item.proxy_host }} -Dhttps.proxyPort={{ item.proxy_port }}  {% elif es_proxy_host is defined and es_proxy_host != '' %} -Dhttp.proxyHost={{ es_proxy_host }} -Dhttp.proxyPort={{ es_proxy_port }} -Dhttps.proxyHost={{ es_proxy_host }} -Dhttps.proxyPort={{ es_proxy_port }} {% endif %}"
+  until: plugin_installed.rc == 0
+  retries: 5
+  delay: 5
+
+- name: Habilitar permissões no diretório de plugins do elasticsearch
+  file:
+    state: directory
+    path: "{{ es_home }}/plugins"
+    owner: "{{ es_user }}"
+    group: "{{ es_group }}"
+    recurse: yes

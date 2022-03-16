@@ -1,0 +1,8 @@
+---
+- name: Install Main PHP Packages
+  yum: name={{ item }} update_cache=yes state=latest
+  loop: [ 'php-fpm', 'php-mysql', 'php', 'php-common' ]
+
+- name: Install PHP Modules / Extensions
+  yum: name={{ item }} update_cache=yes state=latest
+  loop: "{{ php_packages }}"

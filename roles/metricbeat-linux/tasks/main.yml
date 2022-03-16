@@ -1,0 +1,22 @@
+---
+- name: Copia o arquivo rpm
+  copy:
+     src: metricbeat-7.14.2-x86_64.rpm
+     dest: /tmp/metricbeat-7.14.2-x86_64.rpm
+     
+- name: Instala o pacote RPM.
+  yum:
+     name: /tmp/metricbeat-7.14.2-x86_64.rpm
+     state: present     
+           
+- name: Copia o arquivo de configuração
+  template: src=metricbeat.yml.j2 dest=/etc/metricbeat/metricbeat.yml owner=root group=root mode=0644 backup=yes
+
+- name: Habilitar o modulo system
+  shell: metricbeat modules enable system
+
+- name: Instala os modulos do mtricbeat
+  shell: metricbeat setup
+  
+- name: Habilita e Inicia o Serviço
+  service: name=metricbeat state=started enabled=yes

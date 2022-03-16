@@ -1,0 +1,10 @@
+---
+- hosts: conf
+  become: yes
+  become_method: sudo
+  tags:
+    - configuration
+  gather_facts: no
+
+  roles:
+    - copia-arquivo

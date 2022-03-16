@@ -1,0 +1,16 @@
+---
+# tasks file for monta-lis
+
+- name: Monta DVD de instalacao
+  mount:
+    path: /media
+    src: /dev/cdrom
+    fstype: iso9660
+    #opts: ro
+    state: mounted
+
+- name: Acessa o diretorio /media e roda o script de instalacao
+  command: chdir=/media ./install.sh
+#  args:
+#    chdir: /media ./install.sh
+

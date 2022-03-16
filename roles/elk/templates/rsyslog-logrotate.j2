@@ -1,0 +1,12 @@
+#/var/log/servers/kerek/2019/08/20 Exemplo para path abaixo:
+{{ rsyslog_path }}/*/*/*/*/*
+{
+	rotate 52
+	daily
+	missingok
+	notifempty
+	compress
+	postrotate
+	invoke-rc.d rsyslog rotate > /dev/null
+	endscript
+}

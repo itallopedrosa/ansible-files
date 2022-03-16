@@ -1,0 +1,11 @@
+---
+- hosts: todos-debian
+  become: yes
+  become_method: sudo
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python
+
+
+  roles:
+    - filebeat-linux-debian

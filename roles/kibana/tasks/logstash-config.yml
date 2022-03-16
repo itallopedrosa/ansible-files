@@ -1,0 +1,44 @@
+---
+- name: Criar arquivos de configuração do Logstash
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/logstash/conf.d/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - 01-beats-input.conf
+    - 30-elasticsearch-output.conf
+  notify: restart logstash
+
+- name: Criar filtros para o Logstash
+  copy:
+    src: "filters/{{ item }}"
+    dest: "/etc/logstash/conf.d/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - 10-syslog.conf
+    - 11-nginx.conf
+    - 12-apache.conf
+    - 14-solr.conf
+    - 15-drupal.conf
+  notify: restart logstash
+
+- name: Criar arquivos de configuração para Logstash usando syslog
+  template:
+    src: 02-local-syslog-input.conf.j2
+    dest: /etc/logstash/conf.d/02-local-syslog-input.conf
+    owner: root
+    group: root
+    mode: 0644
+  when: logstash_monitor_local_syslog
+  notify: restart logstash
+
+- name: Configurar em caso de não utilização o syslog como desabilitado
+  file:
+    path: /etc/logstash/conf.d/02-local-syslog-input.conf
+    state: absent
+  when: not logstash_monitor_local_syslog
+  notify: restart logstash

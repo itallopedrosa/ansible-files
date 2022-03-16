@@ -1,0 +1,10 @@
+---
+
+- hosts: wildfly-des, wildfly-hlog, wildfly-prod
+  gather_facts: yes
+  become: yes
+#  become_user: root
+  become_method: sudo
+  roles:
+    - alter-user-mtur
+

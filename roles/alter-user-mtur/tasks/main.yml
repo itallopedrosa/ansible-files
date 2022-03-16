@@ -1,0 +1,11 @@
+---
+
+- name: Criar usuario Local de Admin
+  import_tasks: createuser.yaml
+
+
+#- name: Alterar senha de root das maquinas
+#  import_tasks: password.yaml
+
+#- name: Configurar tarefas pos instalacao
+#  import_tasks: posttasks.yaml

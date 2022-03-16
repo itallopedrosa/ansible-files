@@ -1,0 +1,29 @@
+---
+- name: Adicionar repositorio do Logstash
+  template:
+    src: logstash.repo.j2
+    dest: /etc/yum.repos.d/logstash.repo
+    mode: 0644
+
+- name: Instalar Logstash
+  package:
+    name: logstash
+    state: present
+
+- name: Incluir SO especifico na tarefa de instalação
+  include: setup-{{ ansible_os_family }}.yml
+
+- name: Carregar playbook logstash-config.yml
+  include: logstash-config.yml
+
+- name: Carregar playbook ssl.yml  
+  include: ssl.yml
+
+- name: Carregar playbook plugins.yml
+  include: plugins.yml
+
+- name: Habilitar e iniciar serviço
+  service:
+    name: logstash
+    state: started
+    enabled: true

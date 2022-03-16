@@ -1,0 +1,21 @@
+---
+
+- name: Cria usuario local de Admin
+  user:
+    name: jenkins
+    password: $1$SomeSalt$bQWSjSdi051Wk66iYrzUg1
+    comment: Usuario de Deploy de Apps
+    group: sudo
+    shell: /bin/bash
+    createhome: yes
+
+- name: Copia Sudoers
+  copy:
+    src: files/sudoers
+    dest: /etc
+    owner: root
+    group: root
+    mode: 0440
+
+- name: Alterar Atributo (+)
+  command: chattr +i /etc/sudoers

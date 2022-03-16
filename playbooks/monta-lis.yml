@@ -1,0 +1,6 @@
+---
+- hosts: docker-prod
+  become: true
+  become_method: sudo
+  roles:
+    - monta-lis

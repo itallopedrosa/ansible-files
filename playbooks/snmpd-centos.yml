@@ -1,0 +1,23 @@
+# Playbook para Instalar e Configurar o Cliente SNMP em servidor CentOS/RedHat
+
+---
+
+- hosts: centos-prod
+  gather_facts: yes
+  become: yes
+  become_method: sudo
+
+  vars:
+  tasks:
+
+  - name: Instalando Pacote snmpd
+    yum: name=net-snmp state=latest
+
+  - name: Habilitando o servico snmp
+    service: name=snmpd enabled=yes
+
+  - name: Copiando o arquivo de configuracao snmpd.conf
+    copy: src=/static_files/snmpd.conf dest=/etc/snmp/snmpd.conf owner=root group=root mode=644 backup=yes
+
+  - name: Reiniciando Servico
+    service: name=snmpd state=restarted

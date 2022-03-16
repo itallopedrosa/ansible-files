@@ -1,0 +1,39 @@
+#=========================== Filebeat inputs =============================
+
+filebeat.inputs:
+
+- type: log
+  enabled: true
+  paths:
+    - {{ filebeat_log_dir }}    
+  exclude_files: ['.gz$']
+
+#============================= Filebeat modules ===============================
+
+filebeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: true
+
+#==================== Elasticsearch template setting ==========================
+
+setup.template.settings:
+  index.number_of_shards: 3
+  index.codec: best_compression
+  number_of_routing_shards: 15
+
+#============================== Kibana =====================================
+
+setup.kibana:
+
+  host: "{{ kibana_host }}:5601"
+
+#----------------------------- Logstash output --------------------------------
+
+output.logstash:
+  hosts: ["{{ logstash_host }}:5044"]
+
+#================================ Processors =====================================
+
+processors:
+  - add_host_metadata: ~
+  - add_cloud_metadata: ~

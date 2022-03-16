@@ -1,0 +1,6 @@
+---
+- hosts: centos
+  gather_facts: yes
+  become: true
+  roles:
+    - ntp

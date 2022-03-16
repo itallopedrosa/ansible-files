@@ -1,0 +1,35 @@
+
+- name: Reload configuração
+  become: yes
+  command: systemctl daemon-reload
+
+- name: restart elasticsearch
+  become: yes
+  service: 
+    name: elasticsearch 
+    state: restarted 
+    enabled: yes
+  when:
+    - es_restart_on_change
+    - es_start_service
+  register: es_restarted
+
+- name: Reiniciar kibana
+  service: 
+    name: kibana 
+    state: restarted
+
+- name: restart logstash
+  service: 
+    name: logstash 
+    state: restarted
+
+- name: restart filebeat
+  service: 
+    name: filebeat 
+    state: restarted
+
+- name: restart rsyslog
+  service:
+    name: rsyslog
+    state: restarted

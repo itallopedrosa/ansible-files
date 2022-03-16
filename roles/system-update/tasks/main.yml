@@ -1,0 +1,35 @@
+---
+  - name: Atualiza todos os pacotes instalados usando o módulo YUM - Sistemas CentOS
+    yum:
+      name: '*'
+      state: latest
+      update_cache: yes
+      update_only: yes
+    when: ansible_os_family == "RedHat"
+
+  - name: Remove os pacotes que não são mais necessários
+    yum:
+      autoremove: yes
+    when: ansible_os_family == "RedHat"
+
+  #- name: Reboot when packages were updated
+  #  reboot:
+  #  when: yum_update_status.changed
+
+  - name: Atualize todos os pacotes instalados usando o módulo APT - Sistemas Debian
+    apt:
+      name: '*'
+      state: latest
+      update_cache: yes
+      only_upgrade: yes
+    when: ansible_os_family == "Debian"
+
+  - name: Remove os pacotes que não são mais necessários
+    apt:
+      autoremove: yes
+    when: ansible_os_family == "Debian"
+
+#  - name: Reboot when packages were updated
+#    reboot:
+#      post_reboot_delay: 60
+#    when: apt_update_status.changed
